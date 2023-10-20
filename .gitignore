@@ -27,6 +27,7 @@
 *.lib
 
 # Executables
+mbfup
 *.exe
 *.out
 *.app
