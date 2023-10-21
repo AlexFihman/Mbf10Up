@@ -1,15 +1,16 @@
 #ifndef fastlist
 #define fastlist
-#include "mtrand.h"
+#include <random>
+#include "mbf16c.h"
+
+extern std::mt19937 mt;
 
 class TFastList{
-private:
-	static MTRand mt;
 public:
 	TFastList();
 	int           Count;
-	int  Arr[1024];
-	int  Items[1024];
+	int  Arr[NUM_BITS];
+	int  Items[NUM_BITS];
 
 	void  Add(int i);
 	void  Delete(int i);

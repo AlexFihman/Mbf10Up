@@ -5,13 +5,13 @@
 TMbfObj::TMbfObj(){
   int i,j;
   ParentObj = NULL;
-  for (i=0; i<d3; i++){
+  for (i=0; i<DIMENSION+1; i++){
     InList[i] = new TFastList();}
-  for (i=0; i<d3; i++){
+  for (i=0; i<DIMENSION+1; i++){
     OutList[i] = new TFastList();}
 
 
-  for (i=0;i<d3;i++)
+  for (i=0;i<DIMENSION+1;i++)
   {
     for (j=0;j<leveldepth[i];j++)
     {
@@ -20,15 +20,15 @@ TMbfObj::TMbfObj(){
       lvl[i] = 0;
     }
   }
-  for (i=0;i<d1;i++){
-	  arr[i]= false;
+  for (i=0;i<NUM_BITS;i++){
+    arr[i]= false;
   }
 }
 
 TMbfObj::~TMbfObj(){
   int i;
-  for (i=0;i<d3;i++){delete InList[i];};
-  for (i=0;i<d3;i++){delete OutList[i];};
+  for (i=0;i<DIMENSION+1;i++){delete InList[i];};
+  for (i=0;i<DIMENSION+1;i++){delete OutList[i];};
 };
 
 long double SumOfMbf(TMbfObj* mbfobj, int CurrLvl, long double CurrSum){
@@ -38,13 +38,13 @@ long double SumOfMbf(TMbfObj* mbfobj, int CurrLvl, long double CurrSum){
   int CalcType;
   long double result = 0;
   CalcType = 3;
-  if (CurrLvl+2 > d3-1) {CalcType = 2;} else
-    if (CurrLvl+2 > d3-1) {CalcType = 1;} else
-      if (CurrLvl+2<=d3-1) {
+  if (CurrLvl+2 > DIMENSION) {CalcType = 2;} else
+    if (CurrLvl+2 > DIMENSION) {CalcType = 1;} else
+      if (CurrLvl+2<= DIMENSION) {
         if (mbfobj->InList[CurrLvl+2]->Count==0)
         {
            CalcType = 2;
-           if (CurrLvl+1<=d3-1){
+           if (CurrLvl+1<= DIMENSION){
              if (mbfobj->InList[CurrLvl+1]->Count==0){
              CalcType = 1;
              }
@@ -84,7 +84,7 @@ void TMbfObj::AddItem(int item){
 	OutList[curr_lvl]->Add(item);
 	arr[item] = true;
     lvl[curr_lvl]++;
-	for (j=item+1;j<d1;j++){
+	for (j=item+1;j<NUM_BITS;j++){
 		if (((j & item)==item) && (!arr[j])){
 			    lv = levelofitem[j];
                 InList[lv]->Delete(j);
@@ -104,7 +104,7 @@ void TMbfObj::AddRandItem(int curr_lvl){
   arr[Item] = true;
   lvl[curr_lvl]++;
 
-  for (j = Item+1;j<d1;j++){
+  for (j = Item+1;j<NUM_BITS;j++){
   if ( ((j & Item) == Item) && (!arr[j])){
     lv = levelofitem[j];
     InList[lv]->Delete(j);
@@ -125,7 +125,7 @@ void TMbfObj::AddRandItem2(int curr_lvl){
   arr[item] = true;
   lvl[curr_lvl]++;
 
-  for (j = 0;j<d2;j++){
+  for (j = 0;j<DIMENSION;j++){
     item2 = ties[item][j];
     if ( ((item2 & item) == item) && (!arr[item2]) )
     {
@@ -141,7 +141,7 @@ void TMbfObj::AddRandItem2(int curr_lvl){
 void TMbfObj::ClearLevel(int curr_lvl){
   int i,j,item,lv;
 
-  for (i=curr_lvl;i<d3;i++){
+  for (i=curr_lvl;i<DIMENSION+1;i++){
     OutList[i]-> Clear();
     InList[i]->Clear();
     for (j=0;j<leveldepth[i];j++){
@@ -150,7 +150,7 @@ void TMbfObj::ClearLevel(int curr_lvl){
     lvl[i] = 0;
   }
 
-  for (j=0;j<d1;j++){
+  for (j=0;j<NUM_BITS;j++){
     if (levelofitem[j]>=curr_lvl)
       {arr[j]=false;}
   }
@@ -160,7 +160,7 @@ void TMbfObj::ClearLevel(int curr_lvl){
     for (i=0; i<OutList[curr_lvl-1]->Count; i++)
     {
       item = OutList[curr_lvl-1]->Items[i];
-      for (j = item+1; j< d1; j++)
+      for (j = item+1; j< NUM_BITS; j++)
       {
         if ( ((j & item) == item) && (!arr[j]) )
         {

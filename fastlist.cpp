@@ -1,7 +1,10 @@
 #include "fastlist.h"
-#include "string.h"
-#include "mtrand.h"
 #include "assert.h"
+
+std::mt19937 mt;
+
+uint32_t max_value = std::numeric_limits<uint32_t>::max();
+std::uniform_int_distribution<uint32_t> dist(0, max_value);
 
 TFastList::TFastList(){
    Count = 0;
@@ -34,7 +37,7 @@ void TFastList::Clear(){
 int TFastList::RandItem(){
      //return Items[MRandom(Count)];
      assert (Count > 0);
-     int it = mt.Rand()%Count;
+     int it = dist(mt)%Count;
      return Items[it];
 }
 

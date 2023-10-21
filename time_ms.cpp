@@ -12,7 +12,7 @@ double TimeMillis(){
 
 double TimeMillis()
 {
-    struct timeval _tstart, _tend;
+    struct timeval _tstart;
     struct timezone tz;
 
     gettimeofday(&_tstart, &tz);

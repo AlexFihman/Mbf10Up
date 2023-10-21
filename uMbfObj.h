@@ -13,18 +13,18 @@ class TMbfObj {
 public:
 
   TMbfObj*  ParentObj;
-  bool arr[d1];
-  TFastList* InList[d3];
-  TFastList* OutList[d3];
-  char   lvl[d3];
-  char   LvlGrey[d3];
+  bool arr[NUM_BITS];
+  TFastList* InList[DIMENSION+1];
+  TFastList* OutList[DIMENSION+1];
+  char   lvl[DIMENSION+1];
+  char   LvlGrey[DIMENSION+1];
 
   TMbfObj();
-  ~TMbfObj();  
+  ~TMbfObj();
   void AddItem(int item);
   void AddRandItem(int curr_lvl);
   void AddRandItem2(int curr_lvl);
-  void ClearLevel(int curr_lvl);  
+  void ClearLevel(int curr_lvl);
 };
 
 long double SumOfMbf(TMbfObj* mbfobj, int CurrLvl, long double CurrSum);

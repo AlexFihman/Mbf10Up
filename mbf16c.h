@@ -7,17 +7,17 @@
 
 //constants
 
-const int d1 =  1024;      //   {2^d2}
-const int d2 =  10;      //   {d3-1}
-const int d3 =  11;
+const int DIMENSION =  8;// dimension should be between 2 and 11. For bigger dimensions we are running into arithmetic overflows.
+const int NUM_BITS =  1 << DIMENSION;
 
 
-extern int     ties[d1][d2];
-extern int     levelofitem[d1];
-extern int     leveldepth[d3];
-extern int     levellist[d3][d1];
+extern int     ties[NUM_BITS][DIMENSION];
+extern int     levelofitem[NUM_BITS];
+extern int     leveldepth[DIMENSION+1];
+extern int     levellist[DIMENSION+1][NUM_BITS];
 
-extern long double fact[600];
+//cache values of factorials, power of 2, combinatorials. Can be used for DIMENSION up to 11
+extern long double fact[600]; 
 extern long double power2[600];
 extern long double C[463][463];
 

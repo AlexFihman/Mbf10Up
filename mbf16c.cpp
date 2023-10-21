@@ -3,10 +3,10 @@
 #define _mbf16cH_
 #endif
 
-int     ties[d1][d2];
-int     levelofitem[d1];
-int     leveldepth[d3];
-int     levellist[d3][d1];
+int     ties[NUM_BITS][DIMENSION];
+int     levelofitem[NUM_BITS];
+int     leveldepth[DIMENSION+1];
+int     levellist[DIMENSION+1][NUM_BITS];
 
 long double fact[600];
 long double power2[600];
@@ -18,29 +18,29 @@ long double C[463][463];
 void start(){
   int i,j,k;
 
-  for (i=0;i<d1;i++){
+  for (i=0;i<NUM_BITS;i++){
     k=1;
-    for (j=0;j<d2;j++){
+    for (j=0;j<DIMENSION;j++){
       ties[i][j]=i ^ k;
       k=k*2;
     }
   }
 
-  for (i=0;i<d1;i++){
+  for (i=0;i<NUM_BITS;i++){
     levelofitem[i] = 0;
   }
 
-  for (i=0;i<d1;i++){
-	  for (j=0;j<d2;j++){
+  for (i=0;i<NUM_BITS;i++){
+	  for (j=0;j<DIMENSION;j++){
 		  if (ties[i][j]<i)
 		  {
 			  levelofitem[i]++;
 		  }}}
 
-  for (i=0;i<d3;i++){
+  for (i=0;i<DIMENSION+1;i++){
     leveldepth[i]=0;
   }
-  for (i=0;i<d1;i++)
+  for (i=0;i<NUM_BITS;i++)
   {
     int lo = levelofitem[i];
     int ld = leveldepth[lo];
