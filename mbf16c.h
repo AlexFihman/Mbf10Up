@@ -7,7 +7,7 @@
 
 //constants
 
-const int DIMENSION =  8;// dimension should be between 2 and 11. For bigger dimensions we are running into arithmetic overflows.
+const int DIMENSION =  10;// dimension should be between 2 and 11. For bigger dimensions we are running into arithmetic overflows.
 const int NUM_BITS =  1 << DIMENSION;
 
 
