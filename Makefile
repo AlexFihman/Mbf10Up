@@ -1,4 +1,4 @@
-CXX=clang++
+CXX=g++
 CXXFLAGS=-Wall -O3 -march=native -g -pthread
 
 mbfup: mbfup.o fastlist.o uMbfObj.o mbf16c.o time_ms.o
