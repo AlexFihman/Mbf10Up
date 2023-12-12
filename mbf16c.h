@@ -17,9 +17,9 @@ extern int     leveldepth[DIMENSION+1];
 extern int     levellist[DIMENSION+1][NUM_BITS];
 
 //cache values of factorials, power of 2, combinatorials. Can be used for DIMENSION up to 11
-extern double fact[600]; 
-extern double power2[600];
-extern double C[463][463];
+extern long double fact[600]; 
+extern long double power2[600];
+extern long double C[463][463];
 
 void start();
 #endif
