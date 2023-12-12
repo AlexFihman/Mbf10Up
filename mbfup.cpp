@@ -2,6 +2,8 @@
 //
 #include <cstdlib>
 #include <iostream>
+#include <fstream>
+#include <thread>
 #include <math.h>
 #include <random>
 #include "mbf16c.h"
@@ -11,26 +13,31 @@
 
 using namespace std;
 
-int main(int argc, char** argv)
-{
-	int loops = 10000;
-	int seed = 1;
-	if (argc > 1) seed = atoi(argv[1]);
-	cout << "seed =" << seed << endl;
-	mt.seed(seed);
+const int loops = 1000;
 
-	start();
+int c1,c2,c3;
+
+void thread_task(int seed) {
+	//cout << "seed =" << seed << endl;
+
+	std::ofstream wf("experiment"+to_string(seed)+".dat", ios::out | ios::binary);
+   	if(!wf) {
+          cout << "Cannot open file!" << endl;
+          return;
+        }
+
+	mt19937* mt = new mt19937();
+	mt->seed(seed);
+
+
 	std::cout.precision(15);
-	static int c1 = DIMENSION >> 1;
-	static int c2 = DIMENSION - c1;
-	static int c3 = leveldepth[c1];
-	static TMbfObj mbfObj1;
-	static TMbfObj mbfObj2;
+	TMbfObj mbfObj1(mt);
+	TMbfObj mbfObj2(mt);
 
-	long double sum = 0;
-	long double sums = 0;
-	long double sums2 = 0;
-	double t0 = TimeMillis();
+	long double sum;
+	//long double sums = 0;
+	//long double sums2 = 0;
+
 	for (int cycle=0; cycle < loops; cycle++){
 		sum = 0;
 		mbfObj1.ClearLevel(c2);
@@ -50,15 +57,43 @@ int main(int argc, char** argv)
 				mbfObj2.ClearLevel(c1);
 			}
 		}
-		sums += sum;
-		sums2 += sum * sum;
-		std::cout << sum << std::endl;
+		//sums += sum;
+		//sums2 += sum * sum;
+		//std::cout << seed << "\t" << cycle << "\t" << sum << std::endl;
+                wf.write((char*)&seed, sizeof(int));
+                wf.write((char*)&cycle, sizeof(int));
+                wf.write((char*)&sum, sizeof(long double));
+	}
+        wf.close();
+
+	//long double avg = sums/loops;
+	//long double stddev = sqrt(sums2/loops - avg*avg)/sqrt(loops-1);
+	//cout << "avg:  " << avg << endl;
+	//cout << "std.dev:  " << stddev << endl;
+}
+
+
+int main(int argc, char** argv)
+{
+	start();
+        c1 = DIMENSION >> 1;
+        c2 = DIMENSION - c1;
+        c3 = leveldepth[c1];
+
+	int seed = 1;
+	if (argc > 1) seed = atoi(argv[1]);
+
+	int nthread = 10;
+
+	double t0 = TimeMillis();
+	thread** threads = new thread*[nthread];
+	for (int i=0; i<nthread; i++) {
+		threads[i] = new thread(thread_task, seed+i);
+	}
+	for (int i=0; i<nthread; i++) {
+		threads[i]->join();
 	}
 	double t1 = TimeMillis();
-	long double avg = sums/loops;
-	long double stddev = sqrt(sums2/loops - avg*avg)/sqrt(loops-1);
-	cout << "avg:  " << avg << endl;
-	cout << "std.dev:  " << stddev << endl;
 	cout << "runtime: " << (t1-t0) << endl;
 	return 0;
 }

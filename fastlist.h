@@ -3,11 +3,13 @@
 #include <random>
 #include "mbf16c.h"
 
-extern std::mt19937 mt;
+using namespace std;
 
 class TFastList{
+private:
+	mt19937* mt;
 public:
-	TFastList();
+	TFastList(mt19937* mt1);
 	int           Count;
 	int  Arr[NUM_BITS];
 	int  Items[NUM_BITS];

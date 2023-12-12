@@ -1,13 +1,12 @@
 #include "fastlist.h"
 #include "assert.h"
 
-std::mt19937 mt;
-
 uint32_t max_value = std::numeric_limits<uint32_t>::max();
 std::uniform_int_distribution<uint32_t> dist(0, max_value);
 
-TFastList::TFastList(){
+TFastList::TFastList(std::mt19937* mt1){
    Count = 0;
+   mt = mt1;
 };
 
 void TFastList::Add(int i){
@@ -37,7 +36,7 @@ void TFastList::Clear(){
 int TFastList::RandItem(){
      //return Items[MRandom(Count)];
      assert (Count > 0);
-     int it = dist(mt)%Count;
+     int it = dist(*mt)%Count;
      return Items[it];
 }
 

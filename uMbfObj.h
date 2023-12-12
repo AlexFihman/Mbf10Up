@@ -19,7 +19,7 @@ public:
   char   lvl[DIMENSION+1];
   char   LvlGrey[DIMENSION+1];
 
-  TMbfObj();
+  TMbfObj(std::mt19937* mt);
   ~TMbfObj();
   void AddItem(int item);
   void AddRandItem(int curr_lvl);

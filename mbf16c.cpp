@@ -8,9 +8,9 @@ int     levelofitem[NUM_BITS];
 int     leveldepth[DIMENSION+1];
 int     levellist[DIMENSION+1][NUM_BITS];
 
-long double fact[600];
-long double power2[600];
-long double C[463][463];
+double fact[600];
+double power2[600];
+double C[463][463];
 
 //int     arr1[d1];
 //int     arr2[d1];

@@ -2,13 +2,13 @@
 #include "mbf16c.h"
 #include "assert.h"
 
-TMbfObj::TMbfObj(){
+TMbfObj::TMbfObj(std::mt19937* mt){
   int i,j;
   ParentObj = NULL;
   for (i=0; i<DIMENSION+1; i++){
-    InList[i] = new TFastList();}
+    InList[i] = new TFastList(mt);}
   for (i=0; i<DIMENSION+1; i++){
-    OutList[i] = new TFastList();}
+    OutList[i] = new TFastList(mt);}
 
 
   for (i=0;i<DIMENSION+1;i++)
