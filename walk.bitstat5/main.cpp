@@ -115,28 +115,27 @@ int main()
         int total2 = 0;
         for (int ls = 0; ls < LIST_SIZE; ls++)
         {
-            ShortList *sl = mbfList[ls].getMinCNF();
-            if (sl->getSize() > 0)
+            ShortList sl = mbfList[ls].getMinCNF();
+            if (sl.getSize() > 0)
             {
-                BitStorage result = bitStorage[sl->getValue(0)].clone();
-                for (int i = 1; i < sl->getSize(); i++)
-                    result.bitwiseAnd(bitStorage[sl->getValue(i)]);
+                BitStorage result = bitStorage[sl.getValue(0)].clone();
+                for (int i = 1; i < sl.getSize(); i++)
+                    result.bitwiseAnd(bitStorage[sl.getValue(i)]);
                 total2 += result.countBitsSet();
             }
-            delete sl;
         }
         int64_t time4 = time_ms();
         int total3 = 0;
         for (int ls = 0; ls < LIST_SIZE; ls++)
         {
-            ShortList *sl = mbfList[ls].getMinCNF();
+            ShortList sl = mbfList[ls].getMinCNF();
 
             for (size_t nChunk = 0; nChunk < LIST_SIZE / 512; ++nChunk)
             {
-                __m512i chunk = bitStorage[sl->getValue(0)].getChunk(nChunk);
-                for (int i = 1; i < sl->getSize(); i++)
+                __m512i chunk = bitStorage[sl.getValue(0)].getChunk(nChunk);
+                for (int i = 1; i < sl.getSize(); i++)
                 {
-                    __m512i chunk2 = bitStorage[sl->getValue(i)].getChunk(nChunk);
+                    __m512i chunk2 = bitStorage[sl.getValue(i)].getChunk(nChunk);
                     chunk = _mm512_and_si512(chunk, chunk2);
                 }
                 //__m512i resultChunk = result.getChunk(nChunk);
@@ -146,8 +145,6 @@ int main()
                 // Add the result to the total count
                 total3 += _mm512_reduce_add_epi64(popcnt);
             }
-
-            delete sl;
         }
 
         int64_t time5 = time_ms();

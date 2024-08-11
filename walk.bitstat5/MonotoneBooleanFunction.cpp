@@ -134,14 +134,14 @@ void MonotoneBooleanFunction::toRecord(Record &r)
     }
 }
 
-ShortList *MonotoneBooleanFunction::getMinCNF()
+ShortList MonotoneBooleanFunction::getMinCNF()
 {
-    ShortList *result = new ShortList();    
+    ShortList result;    
     for (int i = 0; i < min_cuts.getSize(); i++)
     {
         int element = min_cuts.getValue(i);
         if (functionArray[element])
-            result->insert(element);
+            result.insert(element);
     }
     return result;
 }

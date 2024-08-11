@@ -2,11 +2,15 @@
 #include <immintrin.h> // For AVX-512 intrinsics
 
 BitStorage::BitStorage(size_t bitSize)
-    : storage((bitSize + 63) / 64, 0) {}
+    : storage((uint64_t*) aligned_alloc(64, (bitSize + 511) / 512 * 64)), storage_size(0) {}
+
+BitStorage::~BitStorage() {
+    free(this->storage);
+}
 
 BitStorage BitStorage::clone() const
 {
-    BitStorage copy(storage.size() * 64);
+    BitStorage copy(this->storage_size * 64);
     copy.storage = storage;
     return copy;
 }
@@ -33,47 +37,43 @@ bool BitStorage::getBit(size_t index) const
 
 __m512i BitStorage::getChunk(size_t index) const
 {
-    const uint64_t *thisData = storage.data();
-    return _mm512_loadu_si512(&thisData[index * 8]);
+    return _mm512_load_si512(&storage[index * 8]);
 }
 
 void BitStorage::bitwiseAnd(const BitStorage &other)
 {
-    if (storage.size() != other.storage.size())
+    if (this->storage_size != other.storage_size)
     {
         throw std::invalid_argument("BitStorage objects must have the same size for bitwise AND.");
     }
 
-    size_t numChunks = storage.size() / 8; // Number of 512-bit chunks (8 * 64-bit words = 512 bits)
-    size_t remainder = storage.size() % 8; // Remaining elements after 512-bit chunks
-
-    uint64_t *thisData = storage.data();
-    const uint64_t *otherData = other.storage.data();
+    size_t numChunks = this->storage_size / 8; // Number of 512-bit chunks (8 * 64-bit words = 512 bits)
+    size_t remainder = this->storage_size % 8; // Remaining elements after 512-bit chunks
 
     // Perform the AVX-512 bitwise AND on 512-bit chunks
     for (size_t i = 0; i < numChunks; ++i)
     {
-        __m512i a = _mm512_loadu_si512(&thisData[i * 8]);  // Load 512 bits from this object
-        __m512i b = _mm512_loadu_si512(&otherData[i * 8]); // Load 512 bits from the other object
+        __m512i a = _mm512_load_si512(&this->storage[i * 8]);  // Load 512 bits from this object
+        __m512i b = _mm512_load_si512(&other.storage[i * 8]); // Load 512 bits from the other object
         __m512i result = _mm512_and_si512(a, b);           // Perform bitwise AND
-        _mm512_storeu_si512(&thisData[i * 8], result);     // Store the result back
+        _mm512_store_si512(&this->storage[i * 8], result);     // Store the result back
     }
 
     // Handle the remaining elements that don't fit into a 512-bit chunk
-    for (size_t i = numChunks * 8; i < storage.size(); ++i)
+    for (size_t i = numChunks * 8; i < this->storage_size; ++i)
     {
-        thisData[i] &= otherData[i];
+        this->storage[i] &= other.storage[i];
     }
 }
 
 uint64_t *BitStorage::data()
 {
-    return storage.data();
+    return this->storage;
 }
 
 size_t BitStorage::size() const
 {
-    return storage.size();
+    return this->storage_size;
 }
 
 size_t countChunk(const uint64_t* storage, size_t numuint64_t) 
@@ -87,7 +87,7 @@ size_t countChunk(const uint64_t* storage, size_t numuint64_t)
     // Use AVX-512 to count bits in 512-bit chunks
     for (size_t i = 0; i < numChunks; ++i)
     {
-        __m512i chunk = _mm512_loadu_si512(&storage[i * 8]);
+        __m512i chunk = _mm512_load_si512(&storage[i * 8]);
 
         // Sum the population counts of each 64-bit element
         __m512i popcnt = popcount512_64(chunk);
@@ -113,5 +113,5 @@ size_t countChunk(const uint64_t* storage, size_t numuint64_t)
 
 size_t BitStorage::countBitsSet() const
 {
-    return countChunk(storage.data(), storage.size());
+    return countChunk(this->storage, this->storage_size);
 }

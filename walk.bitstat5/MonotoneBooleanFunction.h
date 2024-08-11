@@ -48,7 +48,7 @@ public:
 
     void toRecord(Record &r);
 
-    ShortList *getMinCNF();
+    ShortList getMinCNF();
 
     static int recordHammingDistance(const Record &rec1, const Record &rec2);
 };

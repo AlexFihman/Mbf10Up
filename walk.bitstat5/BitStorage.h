@@ -29,6 +29,7 @@ class BitStorage
 public:
     // Constructor to initialize storage with a given number of bits
     BitStorage(size_t bitSize);
+    ~BitStorage();
 
     // Clone method to create a deep copy of the object
     BitStorage clone() const;
@@ -58,7 +59,8 @@ public:
     size_t size() const;
 
 private:
-    std::vector<uint64_t> storage; // Stores bits in 64-bit chunks
+    alignas(64) uint64_t* storage; // Stores bits in 64-bit chunks
+    size_t storage_size;
 };
 
 #endif // BITSTORAGE_H
