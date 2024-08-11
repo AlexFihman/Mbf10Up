@@ -10,10 +10,9 @@ private:
     bool containsArr[MAX_SIZE];       // Array to check contains
     int indexArr[MAX_SIZE];           // Array to store the index of each integer
     int size;                         // Current size of the list
-    std::mt19937 &rng;                // Reference to Mersenne Twister random number generator
 
 public:
-    ShortList(std::mt19937 &rng);
+    ShortList();
 
     bool insert(int num);
 
@@ -21,7 +20,7 @@ public:
 
     bool contains(int num) const;
 
-    int getRandomElement() const;
+    int getRandomElement(std::mt19937 &rng) const;
 
     int getSize() const;
 

@@ -6,7 +6,7 @@ int hammingDistance(uint64_t x, uint64_t y)
     return std::bitset<64>(x ^ y).count();
 }
 
-MonotoneBooleanFunction::MonotoneBooleanFunction(int dim, std::mt19937 &rng) : dimension(dim), min_cuts(rng), rng(rng), weight(0)
+MonotoneBooleanFunction::MonotoneBooleanFunction(int dim, std::mt19937 &rng) : dimension(dim), min_cuts(), rng(rng), weight(0)
 {
 
     functionArray = new bool[1 << dim](); // Initialize all values to false
@@ -101,7 +101,7 @@ void MonotoneBooleanFunction::updateMinCutsFast(int index)
 
 int MonotoneBooleanFunction::getRandomMinCut() const
 {
-    return min_cuts.getRandomElement();
+    return min_cuts.getRandomElement(rng);
 }
 
 void MonotoneBooleanFunction::printMinCuts() const
@@ -136,7 +136,7 @@ void MonotoneBooleanFunction::toRecord(Record &r)
 
 ShortList *MonotoneBooleanFunction::getMinCNF()
 {
-    ShortList *result = new ShortList(rng);    
+    ShortList *result = new ShortList();    
     for (int i = 0; i < min_cuts.getSize(); i++)
     {
         int element = min_cuts.getValue(i);

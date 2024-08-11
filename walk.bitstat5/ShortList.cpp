@@ -2,7 +2,7 @@
 #include <algorithm> // For std::find
 #include <iostream>
 
-ShortList::ShortList(std::mt19937 &rng) : size(0), rng(rng)
+ShortList::ShortList() : size(0)
 {
     // Initialize containsArr and indexArr
     std::fill(containsArr, containsArr + MAX_SIZE, false);
@@ -42,7 +42,7 @@ bool ShortList::contains(int num) const
     return num >= 0 && num < MAX_SIZE && containsArr[num];
 }
 
-int ShortList::getRandomElement() const
+int ShortList::getRandomElement(std::mt19937 &rng) const
 {
     if (size > 0)
     {
