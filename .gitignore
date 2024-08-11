@@ -28,6 +28,7 @@
 
 # Executables
 mbfup
+walk
 *.exe
 *.out
 *.app
