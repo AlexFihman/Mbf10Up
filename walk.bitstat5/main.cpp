@@ -70,6 +70,8 @@ int main()
         bitStorage.emplace_back(LIST_SIZE);
     }
 
+    std::cout << "Done Generating" << std::endl;
+
     for (int loop = 0; loop < 1000; loop++)
     {
 
@@ -148,13 +150,36 @@ int main()
         }
 
         int64_t time5 = time_ms();
+        int total4 = 0;
+        for (int ls = 0; ls < LIST_SIZE; ls++)
+        {
+            ShortList sl = mbfList[ls].getMinCNF();
 
-        std::cout << "total1: " << total1 << " total2: " << total2 << " total3: " << total3
+            for (size_t nChunk = 0; nChunk < LIST_SIZE / 512; ++nChunk)
+            {
+                __m512i chunk = bitStorage[sl.getValue(0)].getChunk(nChunk);
+                for (int i = 1; i < sl.getSize(); i++)
+                {
+                    __m512i chunk2 = bitStorage[sl.getValue(i)].getChunk(nChunk);
+                    chunk = _mm512_and_si512(chunk, chunk2);
+                }
+                //__m512i resultChunk = result.getChunk(nChunk);
+                // if (!are_equal(resultChunk, chunk)) std::cout << "not equal" << std::endl;
+
+                __m512i popcnt = popcount512_64(chunk);
+                // Add the result to the total count
+                total3 += _mm512_reduce_add_epi64(popcnt);
+            }
+        }
+        int64_t time6 = time_ms();
+
+        std::cout << "total1: " << total1 << " total2: " << total2 << " total3: " << total3 << " total4: " << total4
                   << " gen.time: " << (time1 - time0)
                   << " cmp1 time: " << (time2 - time1)
                   << " translation time: " << (time3 - time2)
                   << " cmp2 time: " << (time4 - time3)
                   << " cmp3 time: " << (time5 - time4)
+                  << " cmp4 time: " << (time6 - time5)
                   << std::endl;
         // std::cout << loop << "\t" << total << "\t" << (t1 - t0) << "\t" << (t3 - t2) << std::endl;
     }

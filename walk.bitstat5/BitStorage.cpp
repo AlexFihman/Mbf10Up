@@ -1,8 +1,16 @@
 #include "BitStorage.h"
 #include <immintrin.h> // For AVX-512 intrinsics
+#include <string.h>
+
+size_t alignedByteSize(size_t bitSize) {
+    return (bitSize + 511) / 512 * 64;
+}
 
 BitStorage::BitStorage(size_t bitSize)
-    : storage((uint64_t*) aligned_alloc(64, (bitSize + 511) / 512 * 64)), storage_size(0) {}
+    // Alloc 512 bit aligned blocks, aligned to 64 byte page size
+    : storage((uint64_t*) aligned_alloc(64, alignedByteSize(bitSize))), storage_size(bitSize) {
+
+    }
 
 BitStorage::~BitStorage() {
     free(this->storage);
@@ -10,8 +18,8 @@ BitStorage::~BitStorage() {
 
 BitStorage BitStorage::clone() const
 {
-    BitStorage copy(this->storage_size * 64);
-    copy.storage = storage;
+    BitStorage copy(this->storage_size);
+    memcpy(copy.storage, this->storage, alignedByteSize(this->storage_size));
     return copy;
 }
 
