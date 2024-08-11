@@ -78,7 +78,7 @@ void MonotoneBooleanFunction::updateMinCuts()
         }
         else
         {
-            min_cuts.remove(i);
+            min_cuts.remove_if_exists(i);
         }
     }
 }
@@ -94,7 +94,7 @@ void MonotoneBooleanFunction::updateMinCutsFast(int index)
         }
         else
         {
-            min_cuts.remove(idx2);
+            min_cuts.remove_if_exists(idx2);
         }
     }
 }
@@ -136,7 +136,7 @@ void MonotoneBooleanFunction::toRecord(Record &r)
 
 ShortList MonotoneBooleanFunction::getMinCNF()
 {
-    ShortList result;    
+    ShortList result = ShortList();
     for (int i = 0; i < min_cuts.getSize(); i++)
     {
         int element = min_cuts.getValue(i);

@@ -31,6 +31,11 @@ public:
     BitStorage(size_t bitSize);
     ~BitStorage();
 
+    BitStorage(const BitStorage&) = delete;
+    BitStorage& operator=(const BitStorage&) = delete;
+    BitStorage(BitStorage&&) noexcept;
+    BitStorage& operator=(BitStorage&&) noexcept;
+
     // Clone method to create a deep copy of the object
     BitStorage clone() const;
 

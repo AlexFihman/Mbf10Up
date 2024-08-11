@@ -14,9 +14,12 @@ private:
 public:
     ShortList();
 
-    bool insert(int num);
+    void insert(int num);
 
-    bool remove(int num);
+    void remove(int num);
+
+    // Returns true on success
+    bool remove_if_exists(int num);
 
     bool contains(int num) const;
 

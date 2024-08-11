@@ -1,6 +1,7 @@
 #include "ShortList.h"
 #include <algorithm> // For std::find
 #include <iostream>
+#include <assert.h>
 
 ShortList::ShortList() : size(0)
 {
@@ -9,23 +10,30 @@ ShortList::ShortList() : size(0)
     std::fill(indexArr, indexArr + MAX_SIZE, -1); // Invalid index
 }
 
-bool ShortList::insert(int num)
+void ShortList::insert(int num)
 {
-    if (size < MAX_SIZE && !contains(num))
-    {
-        arr[size] = num;
-        containsArr[num] = true;
-        indexArr[num] = size;
-        ++size;
-        return true;
-    }
-    return false; // List is full or integer already exists
+    assert(size < MAX_SIZE);
+    assert(!contains(num));
+    
+    arr[size] = num;
+    containsArr[num] = true;
+    indexArr[num] = size;
+    ++size;
 }
 
-bool ShortList::remove(int num)
+void ShortList::remove(int num)
 {
-    if (contains(num))
-    {
+    assert(contains(num));
+    int idx = indexArr[num];
+    arr[idx] = arr[--size];       // Replace the element with the last element and decrement size
+    containsArr[arr[idx]] = true; // Update containsArr for the moved element
+    containsArr[num] = false;
+    indexArr[arr[idx]] = idx; // Update indexArr for the moved element
+    indexArr[num] = -1;       // Invalidate the index of the removed element
+}
+bool ShortList::remove_if_exists(int num)
+{
+    if(contains(num)) {
         int idx = indexArr[num];
         arr[idx] = arr[--size];       // Replace the element with the last element and decrement size
         containsArr[arr[idx]] = true; // Update containsArr for the moved element
@@ -34,7 +42,7 @@ bool ShortList::remove(int num)
         indexArr[num] = -1;       // Invalidate the index of the removed element
         return true;
     }
-    return false; // Element not found
+    return false;
 }
 
 bool ShortList::contains(int num) const
@@ -44,11 +52,8 @@ bool ShortList::contains(int num) const
 
 int ShortList::getRandomElement(std::mt19937 &rng) const
 {
-    if (size > 0)
-    {
-        return arr[rng() % size];
-    }
-    return -1; // No elements in the list
+    assert(size > 0);
+    return arr[rng() % size];
 }
 
 int ShortList::getSize() const
@@ -58,11 +63,9 @@ int ShortList::getSize() const
 
 int ShortList::getValue(int pos) const
 {
-    if (pos >= 0 && pos < size)
-    {
-        return arr[pos];
-    }
-    return -1; // Invalid position
+    assert(pos >= 0 && pos < size);
+    
+    return arr[pos];
 }
 
 void ShortList::print() const
