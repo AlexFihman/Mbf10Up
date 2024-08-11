@@ -5,6 +5,25 @@
 #include <cstdint>
 #include <stdexcept>
 #include <immintrin.h> // For AVX-512 intrinsics
+
+
+#ifdef __AVX512VPOPCNTDQ__
+#define popcount512_64 _mm512_popcnt_epi64
+#else
+static inline __m512i popcount512_64(__m512i v) {
+    alignas(64) u_int64_t vv[8];
+    _mm512_store_epi64(static_cast<void*>(vv), v);
+
+    for(int i = 0; i < 8; i++) {
+        vv[i] = __builtin_popcountll(vv[i]);
+    }
+
+    return _mm512_load_epi64(static_cast<const void*>(vv));
+}
+#endif
+
+
+
 class BitStorage
 {
 public:

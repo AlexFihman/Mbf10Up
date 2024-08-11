@@ -142,7 +142,7 @@ int main()
                 //__m512i resultChunk = result.getChunk(nChunk);
                 // if (!are_equal(resultChunk, chunk)) std::cout << "not equal" << std::endl;
 
-                __m512i popcnt = _mm512_popcnt_epi64(chunk);
+                __m512i popcnt = popcount512_64(chunk);
                 // Add the result to the total count
                 total3 += _mm512_reduce_add_epi64(popcnt);
             }

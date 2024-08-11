@@ -76,32 +76,42 @@ size_t BitStorage::size() const
     return storage.size();
 }
 
-size_t BitStorage::countBitsSet() const
+size_t countChunk(const uint64_t* storage, size_t numuint64_t) 
 {
     size_t count = 0;
 
-    size_t numChunks = storage.size() / 8; // Number of 512-bit chunks
-    size_t remainder = storage.size() % 8; // Remaining elements after 512-bit chunks
-
-    const uint64_t *thisData = storage.data();
+#ifdef __AVX512VPOPCNTDQ__
+    size_t numChunks = numuint64_t / 8; // Number of 512-bit chunks
+    size_t remainder = numuint64_t % 8; // Remaining elements after 512-bit chunks
 
     // Use AVX-512 to count bits in 512-bit chunks
     for (size_t i = 0; i < numChunks; ++i)
     {
-        __m512i chunk = _mm512_loadu_si512(&thisData[i * 8]);
+        __m512i chunk = _mm512_loadu_si512(&storage[i * 8]);
 
         // Sum the population counts of each 64-bit element
-        __m512i popcnt = _mm512_popcnt_epi64(chunk);
+        __m512i popcnt = popcount512_64(chunk);
 
         // Add the result to the total count
         count += _mm512_reduce_add_epi64(popcnt);
     }
 
     // Handle the remaining elements that don't fit into a 512-bit chunk
-    for (size_t i = numChunks * 8; i < storage.size(); ++i)
+    for (size_t i = numChunks * 8; i < numuint64_t; ++i)
     {
-        count += __builtin_popcountll(thisData[i]);
+        count += __builtin_popcountll(storage[i]);
     }
+#else
+    for (size_t i = 0; i < numuint64_t; ++i)
+    {
+        count += __builtin_popcountll(storage[i]);
+    }
+#endif
 
     return count;
+}
+
+size_t BitStorage::countBitsSet() const
+{
+    return countChunk(storage.data(), storage.size());
 }
