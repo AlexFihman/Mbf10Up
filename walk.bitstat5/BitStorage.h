@@ -4,7 +4,7 @@
 #include <vector>
 #include <cstdint>
 #include <stdexcept>
-
+#include <immintrin.h> // For AVX-512 intrinsics
 class BitStorage
 {
 public:
@@ -25,6 +25,8 @@ public:
 
     // Get the value of a specific bit (0 or 1)
     bool getBit(size_t index) const;
+
+    __m512i getChunk(size_t index) const;
 
     // Bitwise AND operation with another BitStorage
     void bitwiseAnd(const BitStorage &other);

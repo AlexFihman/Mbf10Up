@@ -31,6 +31,12 @@ bool BitStorage::getBit(size_t index) const
     return (storage[index / 64] & (1ULL << (index % 64))) != 0;
 }
 
+__m512i BitStorage::getChunk(size_t index) const
+{
+    const uint64_t *thisData = storage.data();
+    return _mm512_loadu_si512(&thisData[index * 8]);
+}
+
 void BitStorage::bitwiseAnd(const BitStorage &other)
 {
     if (storage.size() != other.storage.size())
