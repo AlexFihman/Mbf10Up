@@ -34,7 +34,7 @@ BitStorage& BitStorage::operator=(BitStorage&& other) noexcept {
 
 BitStorage BitStorage::clone() const
 {
-    BitStorage copy(this->storage_size);
+    BitStorage copy(this->storage_size * sizeof(uint64_t) * 8);
     memcpy(copy.storage, this->storage, this->storage_size * sizeof(uint64_t));
     return copy;
 }
@@ -73,6 +73,7 @@ void BitStorage::bitwiseAnd(const BitStorage &other)
 {
     assert(this->storage_size == other.storage_size);
 
+#ifdef __AVX512F__
     size_t numChunks = this->storage_size / 8; // Number of 512-bit chunks (8 * 64-bit words = 512 bits)
     size_t remainder = this->storage_size % 8; // Remaining elements after 512-bit chunks
 
@@ -90,6 +91,13 @@ void BitStorage::bitwiseAnd(const BitStorage &other)
     {
         this->storage[i] &= other.storage[i];
     }
+#else
+    // Handle the remaining elements that don't fit into a 512-bit chunk
+    for (size_t i = 0; i < this->storage_size; ++i)
+    {
+        this->storage[i] &= other.storage[i];
+    }
+#endif
 }
 
 uint64_t *BitStorage::data()

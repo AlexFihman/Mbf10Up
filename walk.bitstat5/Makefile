@@ -2,7 +2,7 @@
 CXX = g++
 
 # Compiler flags
-CXXFLAGS = -std=c++17 -Wall -Wextra -g -mavx512f -march=native -O0
+CXXFLAGS = -std=c++17 -Wall -Wextra -g -O3 -march=native -mavx512f
 
 # Source files
 SRCS = $(wildcard *.cpp)
