@@ -5,9 +5,11 @@
 #include <iomanip>
 #include <chrono>
 #include <immintrin.h> // For AVX-512 intrinsics
+#include <assert.h>
 #include "ShortList.h"
 #include "MonotoneBooleanFunction.h"
 #include "BitStorage.h"
+#include "FastCompare.h"
 
 bool cmp(uint64_t x1, uint64_t x2)
 {
@@ -151,48 +153,28 @@ int main()
         }
 
         int64_t time5 = time_ms();
-        
-        /*std::vector<int16_t> leftIndices;
-        std::vector<size_t> endPoints;
-        endPoints.reserve(LIST_SIZE);
-        for (int ls = 0; ls < LIST_SIZE; ls++)
-        {
-            ShortList sl = mbfList[ls].getMinCNF();
 
-
-        }
-        int total4 = 0;
-        for (int ls = 0; ls < LIST_SIZE; ls++)
-        {
-            ShortList sl = mbfList[ls].getMinCNF();
-
-            for (size_t nChunk = 0; nChunk < LIST_SIZE / 512; ++nChunk)
-            {
-                __m512i chunk = bitStorage[sl.getValue(0)].getChunk(nChunk);
-                for (int i = 1; i < sl.getSize(); i++)
-                {
-                    __m512i chunk2 = bitStorage[sl.getValue(i)].getChunk(nChunk);
-                    chunk = _mm512_and_si512(chunk, chunk2);
-                }
-                //__m512i resultChunk = result.getChunk(nChunk);
-                // if (!are_equal(resultChunk, chunk)) std::cout << "not equal" << std::endl;
-
-                __m512i popcnt = popcount512_64(chunk);
-                // Add the result to the total count
-                total4 += _mm512_reduce_add_epi64(popcnt);
-            }
-        }
-        std::cout << "time6 done" << std::endl;
-        int64_t time6 = time_ms();*/
-
-        std::cout << "total1: " << total1 << " total2: " << total2 << " total3: " << total3// << " total4: " << total4
+        std::cout << "total1: " << total1 << " total2: " << total2 << " total3: " << total3
                   << " gen.time: " << (time1 - time0)
                   << " cmp1 time: " << (time2 - time1)
                   << " translation time: " << (time3 - time2)
                   << " cmp2 time: " << (time4 - time3)
                   << " cmp3 time: " << (time5 - time4)
-                 // << " cmp4 time: " << (time6 - time5)
                   << std::endl;
+
+
+        // Precompute all Left MBF indices first, because we loop through them often. 
+        FastCompare fc = FastCompare(mbfList, LIST_SIZE);
+
+        fc.template countCompareTo<1>(bitStorage);
+        fc.template countCompareTo<2>(bitStorage);
+        fc.template countCompareTo<4>(bitStorage);
+        fc.template countCompareTo<8>(bitStorage);
+        fc.template countCompareTo<16>(bitStorage);
+        fc.template countCompareTo<32>(bitStorage);
+        fc.template countCompareTo<64>(bitStorage);
+        fc.template countCompareTo<128>(bitStorage);
+        fc.template countCompareTo<256>(bitStorage);
         // std::cout << loop << "\t" << total << "\t" << (t1 - t0) << "\t" << (t3 - t2) << std::endl;
     }
 

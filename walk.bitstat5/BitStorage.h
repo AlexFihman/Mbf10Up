@@ -27,6 +27,11 @@ static inline __m512i popcount512_64(__m512i v) {
 class BitStorage
 {
 public:
+    static const size_t ALLOC_SIZE_ALIGN = 2048;
+    
+    alignas(64) uint64_t* storage; // Stores bits in 64-bit chunks
+    size_t storage_size;
+public:
     // Constructor to initialize storage with a given number of bits
     BitStorage(size_t bitSize);
     ~BitStorage();
@@ -63,9 +68,6 @@ public:
     // Get the size of the data in 64-bit words
     size_t size() const;
 
-private:
-    alignas(64) uint64_t* storage; // Stores bits in 64-bit chunks
-    size_t storage_size;
 };
 
 #endif // BITSTORAGE_H

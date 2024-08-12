@@ -3,13 +3,14 @@
 #include <string.h>
 #include <assert.h>
 
-size_t alignedByteSize(size_t bitSize) {
-    return (bitSize + 511) / 512 * 64;
+size_t alignTo(size_t value, size_t align) {
+    return (value + align - 1) / align * align;
 }
 
 BitStorage::BitStorage(size_t bitSize)
-    // Alloc 512 bit aligned blocks, aligned to 64 byte page size
-    : storage((uint64_t*) aligned_alloc(64, alignedByteSize(bitSize))), storage_size(alignedByteSize(bitSize) / sizeof(uint64_t)) {
+    // Alloc aligned 2048 byte blocks, aligned to 64 byte page size
+    // This allocates more memory than strictly needed, but it simplifies code that uses these bitsets
+    : storage((uint64_t*) aligned_alloc(64, alignTo(bitSize, 8*ALLOC_SIZE_ALIGN) / 8)), storage_size(alignTo(bitSize, 8*64) / 8 / sizeof(uint64_t)) {
 
     }
 
