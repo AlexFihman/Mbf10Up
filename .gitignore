@@ -36,3 +36,7 @@ walk
 # Data files
 *.dat
 OC
+
+# VSCode files
+**/.vscode
+
