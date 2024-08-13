@@ -49,6 +49,33 @@ int main()
     std::mt19937 rng(rd());
     const int dim = 9;
 
+    bool checkLoadRecord = false;
+    if (checkLoadRecord)
+    {
+        std::ifstream inputFile("data/randomMBF9.mbf", std::ios::binary);
+        Record r1;
+        Record r2;
+
+        if (!inputFile) {
+            std::cerr << "Unable to open file!" << std::endl;
+            return 1;
+        }
+        for (int i=0; i< 10; i++) {
+            inputFile.read(reinterpret_cast<char*>(&r1), sizeof(Record));
+            if (inputFile) {
+                MonotoneBooleanFunction mbf(dim, rng);
+                mbf.load(r1);
+                std::cout << "min. cnf size: " << mbf.getMinCNF().getSize() << std::endl;
+                mbf.toRecord(r2);
+                if (!(cmpRecord(r1, r2) && cmpRecord(r2, r1))) std::cout << "failed to load MBF" << std::endl;
+            } else {
+                std::cout << "failed to read record" << std::endl;
+            }
+        }
+        return 0;
+    }
+    
+
     int LIST_SIZE = 512 * 100;
     std::vector<MonotoneBooleanFunction> mbfList;
     mbfList.reserve(LIST_SIZE * 2);

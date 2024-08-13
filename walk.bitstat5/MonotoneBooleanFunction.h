@@ -46,7 +46,9 @@ public:
 
     int minCutSize() const;
 
-    void toRecord(Record &r);
+    void toRecord(Record &r) const;
+
+    void load(Record &r);
 
     ShortList getMinCNF();
 

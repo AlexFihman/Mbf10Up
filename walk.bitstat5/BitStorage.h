@@ -59,6 +59,10 @@ public:
     // Bitwise AND operation with another BitStorage
     void bitwiseAnd(const BitStorage &other);
 
+#ifdef __AVX512F__
+    __m512i getChunk(int nChunk) const;
+#endif
+
     size_t countBitsSet() const;
     // Get a pointer to the underlying data for AVX-512 operations
     uint64_t *data();

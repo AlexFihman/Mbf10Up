@@ -119,7 +119,7 @@ int MonotoneBooleanFunction::minCutSize() const
     return min_cuts.getSize();
 }
 
-void MonotoneBooleanFunction::toRecord(Record &r)
+void MonotoneBooleanFunction::toRecord(Record &r) const
 {
     for (int j = 0; j < rsize; j++)
         r.data[j] = 0;
@@ -132,6 +132,20 @@ void MonotoneBooleanFunction::toRecord(Record &r)
             r.data[p] ^= (1ULL << k);
         }
     }
+}
+
+void MonotoneBooleanFunction::load(Record &r) {
+    weight = 0;
+    for (int j = 0; j < rsize; j++) {
+        for (int k=0; k < 64; k++) {
+            int pos = j * 64 + k;
+            pos = size - pos - 1;
+            functionArray[pos] = (r.data[j] & (1ULL << k)) > 0;
+            if (functionArray[pos]) 
+                weight++;
+        }
+    }
+    updateMinCuts();    
 }
 
 ShortList MonotoneBooleanFunction::getMinCNF()

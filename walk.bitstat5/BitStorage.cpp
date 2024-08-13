@@ -95,6 +95,12 @@ void BitStorage::bitwiseAnd(const BitStorage &other)
 #endif
 }
 
+#ifdef __AVX512F__
+__m512i BitStorage::getChunk(int nChunk) const {
+    return _mm512_load_si512(&storage[nChunk * 8]);
+}
+#endif
+
 uint64_t *BitStorage::data()
 {
     return this->storage;
