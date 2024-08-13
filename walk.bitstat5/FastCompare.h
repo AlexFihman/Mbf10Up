@@ -61,7 +61,7 @@ public:
                     while(++curIndex < endPoint) {
                         const BitStorage& selectedBitset = bitStorage[leftIndices[curIndex]];
                         for(size_t i = 0; i < ChunkSize / 4; i++) {
-                            chunkTMP[i] = _mm256_and_si256(chunkTMP[i], _mm256_load_si256((const __m256i*) &selectedBitset.storage[chunkStart + 8*i]));
+                            chunkTMP[i] = _mm256_and_si256(chunkTMP[i], _mm256_load_si256((const __m256i*) &selectedBitset.storage[chunkStart + 4*i]));
                         }
                     };
 
@@ -75,7 +75,7 @@ public:
                     }
                     continue;
                 }
-                #else
+                #endif
                 alignas(64) uint64_t chunkTMP[ChunkSize];
 
                 const BitStorage& firstBitset = bitStorage[leftIndices[curIndex]];
@@ -92,7 +92,6 @@ public:
                 for(uint64_t& v : chunkTMP) {
                     total += __builtin_popcountll(v);
                 }
-                #endif
             }
         }
         auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_at).count();
