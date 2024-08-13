@@ -27,6 +27,7 @@ public:
         {
             size_t curIndex = 0;
             for(size_t endPoint : endPoints) {
+                #ifdef __AVX512F__
                 if constexpr(ChunkSize >= 8) {
                     alignas(64) __m512i chunkTMP[ChunkSize / 8];
 
@@ -47,23 +48,49 @@ public:
                         totals = _mm512_add_epi64(totals, subTotal);
                     }
                     total += _mm512_reduce_add_epi64(totals);
-                } else {
-                    alignas(64) uint64_t chunkTMP[ChunkSize];
+                    continue;
+                }
+                #elif defined(__AVX2__)
+                if constexpr(ChunkSize >= 4) {
+                    alignas(64) __m256i chunkTMP[ChunkSize / 4];
 
                     const BitStorage& firstBitset = bitStorage[leftIndices[curIndex]];
-                    for(size_t i = 0; i < ChunkSize; i++) {
-                        chunkTMP[i] = firstBitset.storage[chunkStart + i];
+                    for(size_t i = 0; i < ChunkSize / 4; i++) {
+                        chunkTMP[i] = _mm256_load_si256((const __m256i*) &firstBitset.storage[chunkStart + 4*i]);
                     }
                     while(++curIndex < endPoint) {
                         const BitStorage& selectedBitset = bitStorage[leftIndices[curIndex]];
-                        for(size_t i = 0; i < ChunkSize; i++) {
-                            chunkTMP[i] &= selectedBitset.storage[chunkStart + i];
+                        for(size_t i = 0; i < ChunkSize / 4; i++) {
+                            chunkTMP[i] = _mm256_and_si256(chunkTMP[i], _mm256_load_si256((const __m256i*) &selectedBitset.storage[chunkStart + 4*i]));
                         }
                     };
 
-                    for(uint64_t& v : chunkTMP) {
-                        total += __builtin_popcountll(v);
+                    alignas(64) uint64_t elems[4];
+                    for(size_t i = 0; i < ChunkSize / 4; i++) {
+                        _mm256_store_si256((__m256i*) elems, chunkTMP[i]);
+
+                        for(uint64_t& elem : elems) {
+                            total += __builtin_popcountll(elem);
+                        }
                     }
+                    continue;
+                }
+                #endif
+                alignas(64) uint64_t chunkTMP[ChunkSize];
+
+                const BitStorage& firstBitset = bitStorage[leftIndices[curIndex]];
+                for(size_t i = 0; i < ChunkSize; i++) {
+                    chunkTMP[i] = firstBitset.storage[chunkStart + i];
+                }
+                while(++curIndex < endPoint) {
+                    const BitStorage& selectedBitset = bitStorage[leftIndices[curIndex]];
+                    for(size_t i = 0; i < ChunkSize; i++) {
+                        chunkTMP[i] &= selectedBitset.storage[chunkStart + i];
+                    }
+                };
+
+                for(uint64_t& v : chunkTMP) {
+                    total += __builtin_popcountll(v);
                 }
             }
         }

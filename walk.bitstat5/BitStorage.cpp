@@ -64,12 +64,6 @@ bool BitStorage::getBit(size_t index) const
     return (storage[index / 64] & (1ULL << (index % 64))) != 0;
 }
 
-__m512i BitStorage::getChunk(size_t index) const
-{
-    assert(index < this->storage_size / 8);
-    return _mm512_load_si512(&storage[index * 8]);
-}
-
 void BitStorage::bitwiseAnd(const BitStorage &other)
 {
     assert(this->storage_size == other.storage_size);
