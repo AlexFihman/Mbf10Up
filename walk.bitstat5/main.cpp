@@ -49,32 +49,14 @@ int main()
     std::mt19937 rng(rd());
     const int dim = 9;
 
-    bool checkLoadRecord = false;
-    if (checkLoadRecord)
+    std::ifstream inputFile("data/randomMBF9.mbf", std::ios::binary);
+    bool useFileData = true;
+    if (useFileData & !inputFile)
     {
-        std::ifstream inputFile("data/randomMBF9.mbf", std::ios::binary);
-        Record r1;
-        Record r2;
 
-        if (!inputFile) {
-            std::cerr << "Unable to open file!" << std::endl;
-            return 1;
-        }
-        for (int i=0; i< 10; i++) {
-            inputFile.read(reinterpret_cast<char*>(&r1), sizeof(Record));
-            if (inputFile) {
-                MonotoneBooleanFunction mbf(dim, rng);
-                mbf.load(r1);
-                std::cout << "min. cnf size: " << mbf.getMinCNF().getSize() << std::endl;
-                mbf.toRecord(r2);
-                if (!(cmpRecord(r1, r2) && cmpRecord(r2, r1))) std::cout << "failed to load MBF" << std::endl;
-            } else {
-                std::cout << "failed to read record" << std::endl;
-            }
-        }
-        return 0;
+        std::cerr << "Unable to open file!" << std::endl;
+        return 1;
     }
-    
 
     int LIST_SIZE = 512 * 100;
     std::vector<MonotoneBooleanFunction> mbfList;
@@ -85,11 +67,14 @@ int main()
         mbfList.emplace_back(dim, rng);
     }
 
-    for (int ls = 0; ls < LIST_SIZE * 2; ls++)
+    if (!useFileData)
     {
-        for (int i = 0; i < 12000; i++)
+        for (int ls = 0; ls < LIST_SIZE * 2; ls++)
         {
-            mbfList[ls].flipRandom();
+            for (int i = 0; i < 12000; i++)
+            {
+                mbfList[ls].flipRandom();
+            }
         }
     }
 
@@ -107,9 +92,19 @@ int main()
     {
 
         int64_t time0 = time_ms();
+
         for (int ls = 0; ls < LIST_SIZE * 2; ls++)
         {
-            mbfList[ls].step();
+            if (!useFileData)
+            {
+                mbfList[ls].step();
+            }
+            else
+            {
+                Record r1;
+                inputFile.read(reinterpret_cast<char *>(&r1), sizeof(Record));
+                mbfList[ls].load(r1);
+            }
         }
 
         // compare two buffers in the old way
@@ -160,7 +155,7 @@ int main()
         }
         int64_t time4 = time_ms();
         int total3 = 0;
-        #ifdef __AVX512F__
+#ifdef __AVX512F__
         for (int ls = 0; ls < LIST_SIZE; ls++)
         {
             ShortList sl = mbfList[ls].getMinCNF();
@@ -181,20 +176,19 @@ int main()
                 total3 += _mm512_reduce_add_epi64(popcnt);
             }
         }
-        #endif
+#endif
 
         int64_t time5 = time_ms();
 
         std::cout << "total1: " << total1 << " total2: " << total2 << " total3: " << total3
-                  << " gen.time: " << (time1 - time0)
+                  << " load time: " << (time1 - time0)
                   << " cmp1 time: " << (time2 - time1)
                   << " translation time: " << (time3 - time2)
                   << " cmp2 time: " << (time4 - time3)
                   << " cmp3 time: " << (time5 - time4)
                   << std::endl;
 
-
-        // Precompute all Left MBF indices first, because we loop through them often. 
+        // Precompute all Left MBF indices first, because we loop through them often.
         FastCompare fc = FastCompare(mbfList, LIST_SIZE);
 
         fc.template countCompareTo<1>(bitStorage);
