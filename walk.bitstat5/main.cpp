@@ -32,6 +32,7 @@ int64_t time_ms()
     return std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
 }
 
+#ifdef __AVX512F__
 bool are_equal(__m512i a, __m512i b)
 {
     // Compare the 512-bit integers element-wise and return a mask
@@ -40,6 +41,7 @@ bool are_equal(__m512i a, __m512i b)
     // Check if all bits in the mask are set
     return mask == 0xFFFF;
 }
+#endif
 
 int main()
 {
@@ -131,6 +133,7 @@ int main()
         }
         int64_t time4 = time_ms();
         int total3 = 0;
+        #ifdef __AVX512F__
         for (int ls = 0; ls < LIST_SIZE; ls++)
         {
             ShortList sl = mbfList[ls].getMinCNF();
@@ -151,6 +154,7 @@ int main()
                 total3 += _mm512_reduce_add_epi64(popcnt);
             }
         }
+        #endif
 
         int64_t time5 = time_ms();
 

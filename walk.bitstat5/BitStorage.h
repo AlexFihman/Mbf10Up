@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include <immintrin.h> // For AVX-512 intrinsics
 
-
+#ifdef __AVX512F__
 #ifdef __AVX512VPOPCNTDQ__
 #define popcount512_64 _mm512_popcnt_epi64
 #else
@@ -21,7 +21,7 @@ static inline __m512i popcount512_64(__m512i v) {
     return _mm512_load_epi64(static_cast<const void*>(vv));
 }
 #endif
-
+#endif
 
 
 class BitStorage
@@ -55,8 +55,6 @@ public:
 
     // Get the value of a specific bit (0 or 1)
     bool getBit(size_t index) const;
-
-    __m512i getChunk(size_t index) const;
 
     // Bitwise AND operation with another BitStorage
     void bitwiseAnd(const BitStorage &other);
