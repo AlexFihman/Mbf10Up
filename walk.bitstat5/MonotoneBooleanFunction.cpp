@@ -70,6 +70,7 @@ bool MonotoneBooleanFunction::checkMinCut(int index) const
 
 void MonotoneBooleanFunction::updateMinCuts()
 {
+    min_cuts.clear();
     for (int i = 0; i < (1 << dimension); i++)
     {
         if (checkMinCut(i))
@@ -78,7 +79,7 @@ void MonotoneBooleanFunction::updateMinCuts()
         }
         else
         {
-            min_cuts.remove_if_exists(i);
+            min_cuts.remove(i);
         }
     }
 }
@@ -94,7 +95,7 @@ void MonotoneBooleanFunction::updateMinCutsFast(int index)
         }
         else
         {
-            min_cuts.remove_if_exists(idx2);
+            min_cuts.remove(idx2);
         }
     }
 }

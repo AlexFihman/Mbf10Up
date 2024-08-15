@@ -10,28 +10,20 @@ ShortList::ShortList() : size(0)
     std::fill(indexArr, indexArr + MAX_SIZE, -1); // Invalid index
 }
 
-void ShortList::insert(int num)
+bool ShortList::insert(int num)
 {
     assert(size < MAX_SIZE);
-    assert(!contains(num));
+    if (contains(num)) 
+        return false;
     
     arr[size] = num;
     containsArr[num] = true;
     indexArr[num] = size;
     ++size;
+    return true;
 }
 
-void ShortList::remove(int num)
-{
-    assert(contains(num));
-    int idx = indexArr[num];
-    arr[idx] = arr[--size];       // Replace the element with the last element and decrement size
-    containsArr[arr[idx]] = true; // Update containsArr for the moved element
-    containsArr[num] = false;
-    indexArr[arr[idx]] = idx; // Update indexArr for the moved element
-    indexArr[num] = -1;       // Invalidate the index of the removed element
-}
-bool ShortList::remove_if_exists(int num)
+bool ShortList::remove(int num)
 {
     if(contains(num)) {
         int idx = indexArr[num];
@@ -76,4 +68,11 @@ void ShortList::print() const
         std::cout << arr[i] << " ";
     }
     std::cout << std::endl;
+}
+
+void ShortList::clear()
+{
+    size = 0;
+    std::fill(containsArr, containsArr + MAX_SIZE, false);
+    std::fill(indexArr, indexArr + MAX_SIZE, -1); // Invalid index
 }
