@@ -17,10 +17,14 @@ const int loops = 1000;
 
 int c1,c2,c3;
 
-void thread_task(int seed) {
-	//cout << "seed =" << seed << endl;
+struct Record {
+    int seed;
+    int cycle;
+    long double sum;
+};
 
-	std::ofstream wf("experiment"+to_string(seed)+".dat", ios::out | ios::binary);
+void thread_task(int seed) {
+	std::ofstream wf("./data/experiment"+to_string(seed)+".dat", ios::out | ios::binary);
    	if(!wf) {
           cout << "Cannot open file!" << endl;
           return;
@@ -29,22 +33,19 @@ void thread_task(int seed) {
 	mt19937* mt = new mt19937();
 	mt->seed(seed);
 
-
 	std::cout.precision(15);
 	TMbfObj mbfObj1(mt);
 	TMbfObj mbfObj2(mt);
 
-	long double sum;
-	//long double sums = 0;
-	//long double sums2 = 0;
+	Record buf[loops];
 
 	for (int cycle=0; cycle < loops; cycle++){
-		sum = 0;
+		long double sum = 0;
 		mbfObj1.ClearLevel(c2);
 		mbfObj2.ClearLevel(c1);
 		for (int i=0;i<=c3;i++){
-			for (int j=0;j<mbfObj1.InList[c2]->Count;j++){
-				int item = mbfObj1.InList[c2]->Items[j];
+			for (int j=0;j<mbfObj1.InList[c2].Count;j++){
+				int item = mbfObj1.InList[c2].Items[j];
 				item ^= NUM_BITS-1;
 				mbfObj2.AddItem(item);
 			}
@@ -57,19 +58,12 @@ void thread_task(int seed) {
 				mbfObj2.ClearLevel(c1);
 			}
 		}
-		//sums += sum;
-		//sums2 += sum * sum;
-		//std::cout << seed << "\t" << cycle << "\t" << sum << std::endl;
-                wf.write((char*)&seed, sizeof(int));
-                wf.write((char*)&cycle, sizeof(int));
-                wf.write((char*)&sum, sizeof(long double));
+		buf[cycle] = {seed, cycle, sum};
 	}
+        wf.write((char*)buf, sizeof(buf));
         wf.close();
 
-	//long double avg = sums/loops;
-	//long double stddev = sqrt(sums2/loops - avg*avg)/sqrt(loops-1);
-	//cout << "avg:  " << avg << endl;
-	//cout << "std.dev:  " << stddev << endl;
+	delete mt;
 }
 
 

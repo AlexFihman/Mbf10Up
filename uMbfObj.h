@@ -14,8 +14,8 @@ public:
 
   TMbfObj*  ParentObj;
   bool arr[NUM_BITS];
-  TFastList* InList[DIMENSION+1];
-  TFastList* OutList[DIMENSION+1];
+  TFastList InList[DIMENSION+1];
+  TFastList OutList[DIMENSION+1];
   char   lvl[DIMENSION+1];
   char   LvlGrey[DIMENSION+1];
 

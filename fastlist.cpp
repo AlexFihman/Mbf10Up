@@ -4,8 +4,14 @@
 uint32_t max_value = std::numeric_limits<uint32_t>::max();
 std::uniform_int_distribution<uint32_t> dist(0, max_value);
 
+TFastList::TFastList() : mt(nullptr), Count(0) {};
+
 TFastList::TFastList(std::mt19937* mt1){
    Count = 0;
+   mt = mt1;
+};
+
+void TFastList::Init(std::mt19937* mt1){
    mt = mt1;
 };
 

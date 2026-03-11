@@ -28,7 +28,6 @@
 
 # Executables
 mbfup
-walk
 *.exe
 *.out
 *.app
@@ -36,8 +35,3 @@ walk
 # Data files
 *.dat
 OC
-
-# VSCode files
-**/.vscode
-
-walk.bitstat5/data/randomMBF9.mbf

@@ -1,5 +1,5 @@
 CXX=g++
-CXXFLAGS=-Wall -O3 -march=native -g -pthread
+CXXFLAGS=-Wall -O3 -march=native -g -pthread -DNDEBUG
 
 mbfup: mbfup.o fastlist.o uMbfObj.o mbf16c.o time_ms.o
 	$(CXX) $(CXXFLAGS) mbfup.o fastlist.o uMbfObj.o mbf16c.o time_ms.o -o mbfup

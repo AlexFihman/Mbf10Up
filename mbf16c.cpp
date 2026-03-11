@@ -12,6 +12,9 @@ long double fact[600];
 long double power2[600];
 long double C[463][463];
 
+int superset_count[NUM_BITS];
+int supersets[NUM_BITS][NUM_BITS];
+
 //int     arr1[d1];
 //int     arr2[d1];
 
@@ -62,7 +65,17 @@ void start(){
   for (j=0;j<=i;j++)
   {
 	  C[i][j] = C[i-1][j];
-	  if (j>0) C[i][j] += C[i-1][j-1]; 
+	  if (j>0) C[i][j] += C[i-1][j-1];
+  }
+
+  // precompute strict supersets for each item
+  for (i=0; i<NUM_BITS; i++) {
+    superset_count[i] = 0;
+    for (j=i+1; j<NUM_BITS; j++) {
+      if ((j & i) == i) {
+        supersets[i][superset_count[i]++] = j;
+      }
+    }
   }
 
 }
